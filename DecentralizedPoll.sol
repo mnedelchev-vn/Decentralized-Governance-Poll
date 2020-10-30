@@ -57,8 +57,10 @@ contract DecentralizedPoll is Ownable {
     function createPoll(uint256 _poll_id, uint256 _start_date, uint256 _end_date, string memory _poll_question, uint256 _poll_participants, uint256 _minimum_amount_entry, uint256 _maximum_amount_entry, bytes32[] memory _poll_options_arr) external onlyOwner {
         // check if valid poll ID
         require(_poll_id > 0, "Poll ID has to be greater than zero.");
+        
         // check if poll with same ID is not already existing
         require(polls[_poll_id].start_date == 0, "Poll with this poll ID is already existing.");
+        
         // check if start and end date are set and validate if end date timestamp is greater than start date timestamp
         if (_start_date != 0 && _end_date != 0) {
             require(_end_date > _start_date, "Invalid poll dates.");
@@ -96,34 +98,36 @@ contract DecentralizedPoll is Ownable {
         
         // if minimum amount to join the poll is set
         if (polls[_poll_id].minimum_amount_entry != 0) {
-            require(_token_amount > polls[_poll_id].minimum_amount_entry, "Not enough tokens to join the poll.");
+            require(_token_amount >= polls[_poll_id].minimum_amount_entry, "Not enough tokens to join the poll.");
         }
         
         // if maximum amount to join the poll is set
         if (polls[_poll_id].maximum_amount_entry != 0) {
-            require(_token_amount < polls[_poll_id].maximum_amount_entry, "Too much tokens to join the poll.");
+            require(_token_amount <= polls[_poll_id].maximum_amount_entry, "Too much tokens to join the poll.");
         }
 
         poll_options[_poll_id].poll_options.push(PollOptionData(_poll_option_key, _token_amount, msg.sender));
         poll_options[_poll_id].addresses_list[msg.sender] = true;
     }
     
-    function getPollVotes(uint256 _poll_id) view public returns(address[] memory, bytes32[] memory, uint256[] memory) {
+    // execute this function at poll end date to get the most accurate poll results
+    function getPollVotes(uint256 _poll_id, bool _tokenAmountCheck) view public returns(address[] memory, bytes32[] memory, uint256[] memory) {
         uint256 length = poll_options[_poll_id].poll_options.length;
         address[] memory voters_addresses = new address[](length);
         bytes32[] memory voters_options = new bytes32[](length);
         uint256[] memory voters_tokens = new uint256[](length);
         
         for (uint256 i = 0; i < length; i+=1) {
+            // _tokenAmountCheck is set to true then check if user back ups his vote ( if he still own the tokens )
+            if (_tokenAmountCheck && erc20tokenInstance.balanceOf(poll_options[_poll_id].poll_options[i].voter_address) < poll_options[_poll_id].poll_options[i].token_amount) {
+                continue;
+            }
+            
             voters_addresses[i] = poll_options[_poll_id].poll_options[i].voter_address;
             voters_options[i] = polls[_poll_id].poll_options_arr[poll_options[_poll_id].poll_options[i].poll_option_key];
             voters_tokens[i] = poll_options[_poll_id].poll_options[i].token_amount;
         }
         return (voters_addresses, voters_options, voters_tokens);
-    }
-    
-    function getDcnBalance(address _address) view public returns(uint256) {
-        return erc20tokenInstance.balanceOf(_address);
     }
 }
 
