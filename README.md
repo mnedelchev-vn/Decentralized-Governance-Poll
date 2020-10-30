@@ -1,4 +1,4 @@
-# ${1:Governance-Decentralized-Poll}
+# Governance decentralized poll
 Governance decentralized poll which is built to work with any kind of ERC20 token.
 ## Purpose
 This contract brings the decentralization for any kind of ERC20 token. The purpose of the contract is to allow users which are holders of the particular ERC20 token to take part in the decision making of the currency. The contract is built in such cost efficient way that user doesn't have to transfer ( lock ) his ERC20 tokens to the contract, but instead he have to only hold them until the poll finish date.
