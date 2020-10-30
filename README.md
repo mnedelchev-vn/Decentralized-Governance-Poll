@@ -1,5 +1,3 @@
-<snippet>
-  <content><![CDATA[
 # ${1:Governance-Decentralized-Poll}
 Governance decentralized poll which is built to work with any kind of ERC20 token.
 ## Purpose
@@ -17,6 +15,3 @@ This contract brings the decentralization for any kind of ERC20 token. The purpo
 7. The poll creator have the option to setup start and finish date of the poll.
 8. The poll creator have the option to setup as many poll options as needed. ( poll options are stored in array of base32 format, this leads to a limitation in the length of the string ). In order to display the base32 poll options into readable strings you can use `web3.utils.toAscii()` on the front-end side.
 9. Contract method `getPollVotes()` provides the option to take a snapshot of the current poll results. Setting parameter `_tokenAmountCheck` to `true` will make the method to check if the voter still have the token amount which he claimed to have during the time of his vote. This check prevents from users voting with same token amount from multiple addresses.
-]]></content>
-  <tabTrigger>readme</tabTrigger>
-</snippet>
